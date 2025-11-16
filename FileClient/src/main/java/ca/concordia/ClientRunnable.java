@@ -35,7 +35,7 @@ public class ClientRunnable implements Runnable {
                 case 5 -> doList(writer, reader);
             }
 
-            writer.println("QUIT");
+            //writer.println("QUIT");
 
         } catch (Exception e) {
             System.err.println("[Client " + id + "] Error: " + e.getMessage());

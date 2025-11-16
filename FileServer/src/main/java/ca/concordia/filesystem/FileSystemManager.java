@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-
-
 public class FileSystemManager {
 
     private final int MAXFILES = 5;
@@ -38,7 +36,6 @@ public class FileSystemManager {
             disk.setLength(totalSize);
         }
 
-
         //Initialize blocks and free list
         for (int i = 0; i < MAXBLOCKS; i++) {
             blockTable[i] = new FNode(i);
@@ -58,7 +55,7 @@ public class FileSystemManager {
         return instance;
     }
 
-    // ------------------------- LOAD METADATA -------------------------------
+    //  LOAD METADATA
 
     private void loadInodeTable() throws IOException {
         for (int i = 0; i < MAXFILES; i++) {
@@ -101,9 +98,7 @@ public class FileSystemManager {
         }
     }
 
-    //-----Helpers-----------
-
-
+    //Helpers
     //Find an existing file entry by name
     private FEntry findEntry(String name) {
         for (FEntry e : inodeTable) {
@@ -167,45 +162,17 @@ public class FileSystemManager {
             freeBlockList[current] = true;
             int next = blockTable[current].getNext();
             blockTable[current].setNext(-1);
-
             // optional: blank the data on disk
-            disk.seek(dataOffset(current));
-            disk.write(new byte[BLOCK_SIZE]);
+//            disk.seek(dataOffset(current));
+//            disk.write(new byte[BLOCK_SIZE]);
 
             current = next;
         }
     }
 
 
-    //Fentry serialization
-
-
-//    //for delete or overwrite
-//    private void clearBlocks(int firstBlock) {
-//        int current = firstBlock;
-//        while(current!= -1) {
-//            freeBlockList[current]=true; // note the block is free
-//            int next = blockTable[current].getNext();
-//            blockTable[current].setNext(-1); //unlink
-//            current=next;
-//        }
-//    }
-
-
-
-//        public static synchronized FileSystemManager getInstance (String filename, int totalSize) throws IOException {
-//            if(instance == null) {
-//                //TODO Initialize the file system
-//                instance = new FileSystemManager(filename,totalSize);
-//            } else {
-//                throw new IllegalStateException("FileSystemManager is already initialized.");
-//            }
-//            return instance;
-//
-//        }
-
     // Serialize the FEntry at inodeTable[index] into the filesystem file.
-// Layout per entry: 11 bytes filename (ASCII, padded with 0) + 2 bytes size + 2 bytes firstBlock.
+    // Layout per entry: 11 bytes filename (ASCII, padded with 0) + 2 bytes size + 2 bytes firstBlock.
     private void writeFEntryToDisk(int index) throws IOException {
         FEntry entry = inodeTable[index];
 
@@ -273,9 +240,6 @@ public class FileSystemManager {
         try {
             System.out.println("Writer started for: " + filename);
 
-            // *** TESTING DELAY to simulate long write ***
-            //Thread.sleep(10000);   // force writer to hold lock for 3 seconds
-
             FEntry file = findEntry(filename);
             if (file == null)
                 throw new Exception("ERROR: file " + filename + " does not exist");
@@ -339,10 +303,7 @@ public class FileSystemManager {
 
        } finally {
             rwLock.writeLock().unlock();
-            //System.out.println("Content bytes = " + " / Free blocks = " + countFreeBlocks());
-
        }
-        //System.out.println("Content bytes = " + totalBytes + " / Free blocks = " + countFreeBlocks());
     }
 
     //ReadFile

@@ -18,7 +18,7 @@ public class FileServer {
     }
 
     public void start() {
-        try (ServerSocket serverSocket = new ServerSocket(12345)) {
+        try (ServerSocket serverSocket = new ServerSocket(12345,1000)) {
             System.out.println("Server started. Listening on port 12345...");
 
             while (true) {
