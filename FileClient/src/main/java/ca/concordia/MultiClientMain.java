@@ -5,13 +5,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MultiClientMain {
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\nMULTIPLE THREADING TEST\n");
-
         System.out.print("How many threads do you want to launch? ");
         int count = sc.nextInt();
 
@@ -25,16 +23,21 @@ public class MultiClientMain {
         int mode = sc.nextInt();
 
         System.out.println("\nLaunching " + count + " clients...\n");
-        int poolSize = Math.min(count, 1000);
-        ExecutorService executor = Executors.newFixedThreadPool(poolSize);
+
+        ExecutorService pool = Executors.newFixedThreadPool(50);
 
         for (int i = 0; i < count; i++) {
-            executor.submit(new ClientRunnable(i, mode));
-            System.out.println("[Main] Submitted client " + i + " to pool");
+            pool.submit(new ClientRunnable(i, mode));
         }
 
-        executor.shutdown();  // allow pool to finish
+        System.out.println("\nAll clients finished their operation.");
+        System.out.println("Press ENTER to disconnect all clients...");
+        System.in.read(); // Wait for user
 
-        sc.close();
+        // Tell all clients to send QUIT
+        ClientRunnable.DISCONNECT = true;
+
+        pool.shutdown();
+        System.out.println("All clients disconnected.");
     }
 }
