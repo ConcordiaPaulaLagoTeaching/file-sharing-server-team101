@@ -1,14 +1,15 @@
 package ca.concordia;
 
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MultiClientMain {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\nMULTIPLE THREADING TEST\n");
-
         System.out.print("How many threads do you want to launch? ");
         int count = sc.nextInt();
 
@@ -23,12 +24,21 @@ public class MultiClientMain {
 
         System.out.println("\nLaunching " + count + " clients...\n");
 
+        ExecutorService pool = Executors.newFixedThreadPool(500);
+
         for (int i = 0; i < count; i++) {
-            Thread t = new Thread(new ClientRunnable(i, mode));
-            t.start();
-            System.out.println("[Main] Started client " + i + " on thread " + t.getId());
+            pool.submit(new ClientRunnable(i, mode));
+            Thread.sleep(5);
         }
 
-       sc.close();
+        System.out.println("\nAll clients finished their operation.");
+        System.out.println("Press ENTER to disconnect all clients...");
+        System.in.read(); // Wait for user
+
+        // Tell all clients to send QUIT
+        ClientRunnable.DISCONNECT = true;
+
+        pool.shutdown();
+        System.out.println("All clients disconnected.");
     }
 }
