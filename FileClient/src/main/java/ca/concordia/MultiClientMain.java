@@ -24,10 +24,11 @@ public class MultiClientMain {
 
         System.out.println("\nLaunching " + count + " clients...\n");
 
-        ExecutorService pool = Executors.newFixedThreadPool(50);
+        ExecutorService pool = Executors.newFixedThreadPool(500);
 
         for (int i = 0; i < count; i++) {
             pool.submit(new ClientRunnable(i, mode));
+            Thread.sleep(5);
         }
 
         System.out.println("\nAll clients finished their operation.");

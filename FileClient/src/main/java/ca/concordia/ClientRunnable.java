@@ -35,7 +35,9 @@ public class ClientRunnable implements Runnable {
                 case 4 -> doDelete(writer, reader, filename);
                 case 5 -> doList(writer, reader);
             }
-
+            try {
+                Thread.sleep(50 + (int)(Math.random() * 150));
+            } catch (InterruptedException ignored) {}
             writer.println("QUIT");
 
         } catch (InterruptedException ie) {
