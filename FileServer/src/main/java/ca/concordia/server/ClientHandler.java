@@ -88,7 +88,7 @@ public class ClientHandler implements Runnable {
                                     writer.println("Another user is writing. Retrying in 3 seconds...");
                                     writer.flush();
 
-                                    Thread.sleep(15000);
+                                    //Thread.sleep(15000);
                                     // try again automatically after delay
                                     fsManager.writeFile(filename, content);
                                     writer.println("SUCCESS: File written after retry.");
