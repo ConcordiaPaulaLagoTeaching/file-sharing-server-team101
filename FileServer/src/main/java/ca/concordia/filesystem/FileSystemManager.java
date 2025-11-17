@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class FileSystemManager {
 
-    private final int MAXFILES = 10;
+    private final int MAXFILES = 5;
     private final int MAXBLOCKS = 10;
     private static final int BLOCK_SIZE = 128;
     private final long DATA_START = (long) MAXFILES * FENTRY_SIZE;
