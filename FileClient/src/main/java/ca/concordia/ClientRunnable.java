@@ -11,6 +11,28 @@ public class ClientRunnable implements Runnable {
     private final int mode;
     public static volatile boolean DISCONNECT = false; // controlled shutdown
 
+    private String[] getExistingFiles(PrintWriter writer, BufferedReader reader) throws Exception {
+        writer.println("LIST");
+        Thread.sleep(10);
+
+        String line;
+        StringBuilder sb = new StringBuilder();
+
+        while ((line = reader.readLine()) != null) {
+            if (line.equals("FILES:") || line.equals("No files on server.")) {
+                continue;
+            }
+            sb.append(line).append("\n");
+            if (!reader.ready()) break;
+        }
+
+        String all = sb.toString().trim();
+        if (all.isEmpty()) return new String[0];
+
+        return all.split("\n");
+    }
+
+
     public ClientRunnable(int id, int mode) {
         this.id = id;
         this.mode = mode;
@@ -26,7 +48,26 @@ public class ClientRunnable implements Runnable {
             Thread.sleep(10);
             while (reader.ready()) reader.readLine();
 
-            String filename = "file" + ((id % 5) + 1) + ".txt";
+            String filename;
+
+            if (mode == 1) {
+                // for create format (instead of random or type one by one)
+                filename = "file" + id + ".txt";
+            } else {
+                // for read, create, list and delete mode
+                String[] files = getExistingFiles(writer, reader);
+
+                if (files.length == 0) {
+                    System.out.println("[Client " + id + "] No files exist — creating a new one.");
+
+                    filename = "file" + id + ".txt";
+                    writer.println("CREATE " + filename);
+                    reader.readLine(); // consume response
+                } else {
+                    filename = files[id % files.length]; // pick an existing file
+                }
+            }
+
 
             switch (mode) {
                 case 1 -> doCreate(writer, reader, filename);
@@ -36,8 +77,9 @@ public class ClientRunnable implements Runnable {
                 case 5 -> doList(writer, reader);
             }
             try {
-                Thread.sleep(50 + (int)(Math.random() * 150));
-            } catch (InterruptedException ignored) {}
+                Thread.sleep(50 + (int) (Math.random() * 150));
+            } catch (InterruptedException ignored) {
+            }
             writer.println("QUIT");
 
         } catch (InterruptedException ie) {
@@ -54,7 +96,7 @@ public class ClientRunnable implements Runnable {
     }
 
     private void doWrite(PrintWriter writer, BufferedReader reader, String filename) throws Exception {
-        Thread.sleep(20 + (int)(Math.random() * 100)); // slight delay for concurrency test
+        Thread.sleep(20 + (int) (Math.random() * 100)); // slight delay for concurrency test
         String data = "\"Thread " + id + " is writing to " + filename + "\"";
 
         writer.println("WRITE " + filename + " " + data);
