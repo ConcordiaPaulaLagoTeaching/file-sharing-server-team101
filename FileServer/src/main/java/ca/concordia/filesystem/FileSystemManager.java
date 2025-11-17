@@ -15,7 +15,7 @@ public class FileSystemManager {
     private final int MAXFILES = 5;
     private final int MAXBLOCKS = 10;
     private static final int BLOCK_SIZE = 128;
-    private final long DATA_START = 115;
+    private final long DATA_START = (long) MAXFILES * FENTRY_SIZE;
     // 11 (filename) + 2 (size) + 2 (firstBlock)
     private static final int FENTRY_SIZE = 15;
 
@@ -32,8 +32,10 @@ public class FileSystemManager {
     public FileSystemManager(String filename, int totalSize) throws IOException {
         // Initialize the file system manager with a file
         disk = new RandomAccessFile(filename, "rw");
-        if (disk.length() == 0) {
-            disk.setLength(totalSize);
+
+        long neededSize = DATA_START + (long) MAXBLOCKS * BLOCK_SIZE;
+        if (disk.length() < neededSize) {
+            disk.setLength(neededSize);
         }
 
         //Initialize blocks and free list
