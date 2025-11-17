@@ -75,6 +75,7 @@ public class ClientRunnable implements Runnable {
                 case 3 -> doRead(writer, reader, filename);
                 case 4 -> doDelete(writer, reader, filename);
                 case 5 -> doList(writer, reader);
+                case 6 -> doQuit(writer);
             }
             try {
                 Thread.sleep(50 + (int) (Math.random() * 150));
@@ -130,5 +131,9 @@ public class ClientRunnable implements Runnable {
             System.out.println("[LIST] " + id + ": " + line);
             if (!reader.ready()) break;
         }
+    }
+    private void doQuit(PrintWriter writer) throws Exception {
+        writer.println("QUIT");
+        System.out.println("[QUIT] Thread " + id + " quiting");
     }
 }
